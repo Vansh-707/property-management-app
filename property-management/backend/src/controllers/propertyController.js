@@ -1,4 +1,13 @@
 const PropertyService = require('../services/propertyService');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'error',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'error.log' })
+    ]
+});
 
 // Create a new property
 exports.createProperty = async (req, res) => {
@@ -22,6 +31,7 @@ exports.createProperty = async (req, res) => {
         const property = await PropertyService.createProperty({ name, address });
         res.status(201).json(property);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({ message: error.message });
     }
 };
@@ -42,6 +52,18 @@ exports.getPropertyDetails = async (req, res) => {
         }
         res.status(200).json(property);
     } catch (error) {
+        logger.error(error.message);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get all properties
+exports.getAllProperties = async (req, res) => {
+    try {
+        const properties = await PropertyService.getAllProperties();
+        res.status(200).json(properties);
+    } catch (error) {
+        logger.error(error.message);
         res.status(500).json({ message: error.message });
     }
 };

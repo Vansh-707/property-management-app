@@ -45,9 +45,9 @@ import { Property, Floor } from '../../models/interfaces';
             <div class="mb-3">
               <label class="form-label">Unit Number</label>
               <input type="text" class="form-control" formControlName="unitNumber">
-              <div *ngIf="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid" 
-                   class="text-danger">
-                Unit number is required
+              <div *ngIf="unitForm.get('unitNumber')?.touched && unitForm.get('unitNumber')?.invalid" class="text-danger">
+                <div *ngIf="unitForm.get('unitNumber')?.errors?.['required']">Unit number is required</div>
+                <div *ngIf="unitForm.get('unitNumber')?.errors?.['pattern']">Unit number can only contain letters, numbers, underscores, and dashes</div>
               </div>
             </div>
 
@@ -76,7 +76,7 @@ export class AddUnitComponent implements OnInit {
     this.unitForm = this.fb.group({
       propertyId: ['', Validators.required],
       floorId: ['', Validators.required],
-      unitNumber: ['', [Validators.required, Validators.minLength(1)]]
+      unitNumber: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9_-]+$/)]] // Allow alphanumeric, underscores, and dashes
     });
   }
 
@@ -110,12 +110,17 @@ export class AddUnitComponent implements OnInit {
   onSubmit() {
     if (this.unitForm.valid) {
       this.isLoading = true;
-      const { floorId, unitNumber } = this.unitForm.value;
+      const { propertyId, floorId, unitNumber } = this.unitForm.value;
+      if (!propertyId) {
+        console.error('Invalid propertyId:', propertyId);
+        this.isLoading = false;
+        return;
+      }
       this.apiService.createUnit({ floorId, unitNumber }).subscribe({
         next: () => {
           this.unitForm.reset();
           this.isLoading = false;
-          this.router.navigate(['/properties', this.unitForm.value.propertyId]);
+          this.router.navigate(['/properties', propertyId]);
         },
         error: (error) => {
           console.error('Error:', error);

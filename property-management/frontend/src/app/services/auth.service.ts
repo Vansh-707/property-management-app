@@ -12,14 +12,18 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(userId: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.baseUrl}/login`, { userId }).pipe(
+  login(userId: string, password: string): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.baseUrl}/login`, { username: userId, password }).pipe(
       tap(response => {
         if (response.token) {
           this.setToken(response.token);
         }
       })
     );
+  }
+
+  register(userId: string, password: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/register`, { username: userId, password });
   }
 
   getToken(): string | null {
@@ -32,6 +36,10 @@ export class AuthService {
 
   removeToken(): void {
     localStorage.removeItem(this.tokenKey);
+  }
+
+  clearSession(): void {
+    this.removeToken();
   }
 
   isAuthenticated(): boolean {

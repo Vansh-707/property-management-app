@@ -19,7 +19,7 @@ import { Property } from '../../models/interfaces';
               <select class="form-select" formControlName="propertyId">
                 <option value="">Select a property</option>
                 <option *ngFor="let property of properties" [value]="property.id">
-                  {{property.name}} - {{property.address}}
+                  {{property.name}}
                 </option>
               </select>
               <div *ngIf="floorForm.get('propertyId')?.touched && floorForm.get('propertyId')?.invalid" 
@@ -31,9 +31,9 @@ import { Property } from '../../models/interfaces';
             <div class="mb-3">
               <label class="form-label">Floor Number</label>
               <input type="number" class="form-control" formControlName="floorNumber" min="0">
-              <div *ngIf="floorForm.get('floorNumber')?.touched && floorForm.get('floorNumber')?.invalid" 
-                   class="text-danger">
-                Valid floor number is required
+              <div *ngIf="floorForm.get('floorNumber')?.touched && floorForm.get('floorNumber')?.invalid" class="text-danger">
+                <div *ngIf="floorForm.get('floorNumber')?.errors?.['required']">Floor number is required</div>
+                <div *ngIf="floorForm.get('floorNumber')?.errors?.['pattern']">Floor number must be a positive integer</div>
               </div>
             </div>
 
@@ -60,7 +60,7 @@ export class AddFloorComponent implements OnInit {
   ) {
     this.floorForm = this.fb.group({
       propertyId: ['', Validators.required],
-      floorNumber: ['', [Validators.required, Validators.min(0)]]
+      floorNumber: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]] // Only positive integers
     });
   }
 
@@ -78,11 +78,18 @@ export class AddFloorComponent implements OnInit {
   onSubmit() {
     if (this.floorForm.valid) {
       this.isLoading = true;
+      console.log('Form Value:', this.floorForm.value); // Log the form value for debugging
+      const propertyId = this.floorForm.value.propertyId;
+      if (!propertyId) {
+        console.error('Property ID is required but not provided.');
+        this.isLoading = false;
+        return;
+      }
       this.apiService.createFloor(this.floorForm.value).subscribe({
         next: () => {
           this.floorForm.reset();
           this.isLoading = false;
-          this.router.navigate(['/properties', this.floorForm.value.propertyId]);
+          this.router.navigate(['/properties', propertyId]);
         },
         error: (error) => {
           console.error('Error:', error);

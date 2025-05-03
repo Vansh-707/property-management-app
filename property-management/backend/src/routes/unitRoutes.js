@@ -11,6 +11,9 @@ router.post('/', unitController.createUnit);
 // Get all available units
 router.get('/available', unitController.getAvailableUnits);
 
+// Get booking history
+router.get('/history', auth, unitController.getBookingHistory);
+
 // Book a unit (protected by auth)
 router.put('/:id/book', auth, unitController.bookUnit);
 

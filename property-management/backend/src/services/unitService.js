@@ -54,8 +54,23 @@ const bookUnit = async (unitId, userId) => {
     }
 };
 
+// Fetch booking history
+const getBookingHistory = async () => {
+    const query = `
+        SELECT bh.*, u.unit_number, f.floor_number, p.name as property_name
+        FROM booking_history bh
+        JOIN units u ON bh.unit_id = u.id
+        JOIN floors f ON u.floor_id = f.id
+        JOIN properties p ON f.property_id = p.id
+        ORDER BY bh.booked_at DESC
+    `;
+    const result = await db.query(query);
+    return result.rows;
+};
+
 module.exports = {
     createUnit,
     getAvailableUnits,
-    bookUnit
+    bookUnit,
+    getBookingHistory
 };

@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
-import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 import { Unit } from '../../models/interfaces';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-available-units',
@@ -31,22 +31,25 @@ import { Unit } from '../../models/interfaces';
         </div>
       </div>
     </div>
-    <app-login-dialog #loginDialog></app-login-dialog>
   `
 })
 export class AvailableUnitsComponent implements OnInit {
-  @ViewChild('loginDialog') loginDialog!: LoginDialogComponent;
   availableUnits: Unit[] = [];
   isLoading = false;
   error: string | null = null;
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.loadAvailableUnits();
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+    } else {
+      this.loadAvailableUnits();
+    }
   }
 
   loadAvailableUnits() {
@@ -64,15 +67,16 @@ export class AvailableUnitsComponent implements OnInit {
 
   async bookUnit(unitId: number) {
     if (!this.authService.isAuthenticated()) {
-      const authenticated = await this.loginDialog.show();
-      if (!authenticated) return;
+      this.router.navigate(['/login']); // Redirect to login if not authenticated
+      return;
     }
 
     this.isLoading = true;
     this.error = null;
-    
+
     this.apiService.bookUnit(unitId).subscribe({
       next: () => {
+        this.displayConfirmationMessage('Confirmed your booking'); // Display confirmation message
         this.loadAvailableUnits();
         this.isLoading = false;
       },
@@ -84,5 +88,24 @@ export class AvailableUnitsComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  displayConfirmationMessage(message: string) {
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.textContent = message;
+    confirmationDiv.style.position = 'fixed';
+    confirmationDiv.style.top = '50%';
+    confirmationDiv.style.left = '50%';
+    confirmationDiv.style.transform = 'translate(-50%, -50%)';
+    confirmationDiv.style.backgroundColor = 'green';
+    confirmationDiv.style.color = 'white';
+    confirmationDiv.style.padding = '20px';
+    confirmationDiv.style.borderRadius = '5px';
+    confirmationDiv.style.zIndex = '1000';
+    document.body.appendChild(confirmationDiv);
+
+    setTimeout(() => {
+      document.body.removeChild(confirmationDiv);
+    }, 3000); // Remove the message after 3 seconds
   }
 }

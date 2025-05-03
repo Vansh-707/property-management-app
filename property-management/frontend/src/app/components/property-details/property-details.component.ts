@@ -7,45 +7,26 @@ import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 @Component({
   selector: 'app-property-details',
   template: `
-    <div class="container mt-4" *ngIf="property">
-      <div class="alert alert-danger" *ngIf="error">
-        {{error}}
+    <div class="container mt-4">
+      <h2>Property Details</h2>
+      <div *ngIf="property">
+        <h3>{{ property.name }}</h3>
+        <p>{{ property.address }}</p>
+
+        <h4>Floors</h4>
+        <ul>
+          <li *ngFor="let floor of property.floors">
+            Floor {{ floor.floor_number }}
+            <ul>
+              <li *ngFor="let unit of floor.units">
+                Unit {{ unit.unit_number }}
+              </li>
+            </ul>
+          </li>
+        </ul>
       </div>
-      
-      <div class="card">
-        <div class="card-body">
-          <h2 class="card-title">{{property.name}}</h2>
-          <p class="card-text">Address: {{property.address}}</p>
-        </div>
-      </div>
-      
-      <div class="mt-4">
-        <div *ngFor="let floor of property.floors" class="card mb-3">
-          <div class="card-header">
-            <h3 class="mb-0">Floor {{floor.floor_number}}</h3>
-          </div>
-          <div class="card-body">
-            <div *ngFor="let unit of floor.units" class="d-flex justify-content-between align-items-center mb-2">
-              <span>Unit {{unit.unit_number}} - 
-                <span [class]="unit.status === 'available' ? 'text-success' : 'text-danger'">
-                  {{unit.status}}
-                </span>
-              </span>
-              <button *ngIf="unit.status === 'available'" 
-                      class="btn btn-primary"
-                      (click)="bookUnit(unit.id)"
-                      [disabled]="isLoading">
-                {{ isLoading ? 'Booking...' : 'Book Unit' }}
-              </button>
-            </div>
-            <div *ngIf="floor.units?.length === 0" class="text-muted">
-              No units on this floor
-            </div>
-          </div>
-        </div>
-        <div *ngIf="property.floors?.length === 0" class="alert alert-info">
-          No floors added to this property yet
-        </div>
+      <div *ngIf="!property">
+        Loading property details...
       </div>
     </div>
     <app-login-dialog #loginDialog></app-login-dialog>
@@ -64,11 +45,13 @@ export class PropertyDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.loadPropertyDetails(params['id']);
-      }
-    });
+    const propertyId = this.route.snapshot.paramMap.get('id');
+    if (propertyId) {
+      this.apiService.getPropertyDetails(+propertyId).subscribe({
+        next: (data) => this.property = data,
+        error: (error) => console.error('Error fetching property details:', error)
+      });
+    }
   }
 
   loadPropertyDetails(id: number) {

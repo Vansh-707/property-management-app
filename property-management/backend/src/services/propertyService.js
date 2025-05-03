@@ -13,7 +13,7 @@ const createProperty = async (propertyData) => {
 
 // Get all properties
 const getAllProperties = async () => {
-    const query = 'SELECT * FROM properties';
+    const query = 'SELECT * FROM properties ORDER BY created_at DESC';
     const result = await db.query(query);
     return result.rows;
 };
@@ -26,8 +26,24 @@ const getPropertyById = async (id) => {
     return result.rows[0];
 };
 
+// Get property details along with associated floors
+const getPropertyDetails = async (id) => {
+    const query = `
+        SELECT p.*, 
+               json_agg(f.*) AS floors
+        FROM properties p
+        LEFT JOIN floors f ON p.id = f.property_id
+        WHERE p.id = $1
+        GROUP BY p.id
+    `;
+    const values = [id];
+    const result = await db.query(query, values);
+    return result.rows[0];
+};
+
 module.exports = {
     createProperty,
     getAllProperties,
     getPropertyById,
+    getPropertyDetails
 };

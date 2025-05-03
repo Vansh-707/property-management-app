@@ -6,6 +6,7 @@ CREATE TABLE properties (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
 -- Create floors table
 CREATE TABLE floors (
     id SERIAL PRIMARY KEY,
@@ -30,3 +31,15 @@ CREATE TABLE booking_history (
     user_id VARCHAR(50) NOT NULL,
     booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create users table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert a test user
+INSERT INTO users (username, password) VALUES ('vansh', 'password');
+

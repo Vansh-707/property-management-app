@@ -20,8 +20,8 @@ export class ApiService {
     return this.http.post<Property>(`${this.baseUrl}/properties`, property);
   }
 
-  getPropertyDetails(id: number): Observable<Property> {
-    return this.http.get<Property>(`${this.baseUrl}/properties/${id}/details`);
+  getPropertyDetails(propertyId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/properties/${propertyId}/details`);
   }
 
   // Floors
@@ -40,5 +40,14 @@ export class ApiService {
 
   bookUnit(unitId: number): Observable<Unit> {
     return this.http.put<Unit>(`${this.baseUrl}/units/${unitId}/book`, {});
+  }
+
+  getBookingHistory(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/units/history`);
+  }
+
+  register(userId: string, password: string): Observable<any> {
+    const user = { username: userId, password };
+    return this.http.post(`${this.baseUrl}/auth/register`, user);
   }
 }

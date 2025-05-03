@@ -1,4 +1,13 @@
 const floorService = require('../services/floorService');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'error',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'error.log' })
+    ]
+});
 
 // Create a new floor
 exports.createFloor = async (req, res) => {
@@ -19,6 +28,7 @@ exports.createFloor = async (req, res) => {
         const newFloor = await floorService.createFloor(propertyId, floorNumber);
         res.status(201).json(newFloor);
     } catch (error) {
+        logger.error(error.message);
         if (error.code === '23503') { // Foreign key violation
             res.status(400).json({ message: 'Property does not exist' });
         } else {
@@ -40,6 +50,7 @@ exports.getFloorsByProperty = async (req, res) => {
         const floors = await floorService.getFloorsByPropertyId(propertyId);
         res.status(200).json(floors);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({ message: error.message });
     }
 };
