@@ -1,0 +1,32 @@
+-- Create properties table
+CREATE TABLE properties (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create floors table
+CREATE TABLE floors (
+    id SERIAL PRIMARY KEY,
+    property_id INTEGER REFERENCES properties(id),
+    floor_number INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create units table
+CREATE TABLE units (
+    id SERIAL PRIMARY KEY,
+    floor_id INTEGER REFERENCES floors(id),
+    unit_number VARCHAR(50) NOT NULL,
+    status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'booked')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create booking_history table for JWT authentication tracking
+CREATE TABLE booking_history (
+    id SERIAL PRIMARY KEY,
+    unit_id INTEGER REFERENCES units(id),
+    user_id VARCHAR(50) NOT NULL,
+    booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
