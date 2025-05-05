@@ -11,7 +11,7 @@ A full-stack web application built with **Node.js**, **PostgreSQL**, and **Angul
 **Database:** PostgreSQL  
 **ORM/Query Tool:** pg (node-postgres)  
 **Authentication (Optional):** JWT  
-**Deployment (Optional):** Render / Railway / Vercel  
+**Deployment (Optional):** Render / Railway  
 
 ---
 
@@ -74,6 +74,3 @@ POST	/units	Create a unit under a floor
 GET	/properties/:id/details	Get full nested property details
 PUT	/units/:id/book	Book a unit
 GET	/units/available	Get all available units
-
-📺 Demo link :-
-Live Demo: https://your-deployment-url.com

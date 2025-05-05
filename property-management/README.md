@@ -1,4 +1,4 @@
-# Basic Property Management System
+# Property Management Documentation
 
 A simple property management system with basic CRUD operations.
 
@@ -41,3 +41,5 @@ A simple property management system with basic CRUD operations.
 ## Usage
 - Access the application at http://localhost:4200
 - Backend API runs at http://localhost:3000
+
+**Deployment (Optional):** Render / Railway
