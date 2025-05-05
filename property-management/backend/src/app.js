@@ -13,6 +13,9 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Backend is running!');
+});
 app.use('/auth', authRoutes);
 app.use('/properties', propertyRoutes);
 app.use('/floors', floorRoutes);
